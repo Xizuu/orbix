@@ -146,7 +146,7 @@ export function LandingPage() {
               <div className="relative">
                 <TabsContent value="all" className={`grid gap-8 lg:grid-cols-3 transition-opacity duration-1000 ${activeTab === 'all' ? 'opacity-100' : 'opacity-0'}`}>
                   <ProductCard
-                    title="Web Hosting"
+                    title="Website Hosting"
                     description="Fast and reliable web hosting solutions for businesses of all sizes."
                     icon={<Globe className="h-8 w-8 text-blue-500" />}
                   />
