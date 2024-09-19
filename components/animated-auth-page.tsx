@@ -1,19 +1,22 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Rocket, EyeIcon, EyeOffIcon } from 'lucide-react'
+import { Rocket, EyeIcon, EyeOffIcon, AlertCircle } from 'lucide-react'
 import Link from "next/link"
 import { motion, AnimatePresence } from 'framer-motion'
-
+import { Alert } from './alert'
+import { AlertDescription } from './alert'
+import { AlertTitle } from './alert'
 export default function AuthPage() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState("login")
   const [showPassword, setShowPassword] = useState(false)
   const [agreedToTerms, setAgreedToTerms] = useState(false)
@@ -24,6 +27,7 @@ export default function AuthPage() {
   const [signupEmail, setSignupEmail] = useState("")
   const [signupPassword, setSignupPassword] = useState("")
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("")
+  const [resetCode, setResetCode] = useState("")
 
   const [loginEmailError, setLoginEmailError] = useState("")
   const [loginPasswordError, setLoginPasswordError] = useState("")
@@ -31,6 +35,10 @@ export default function AuthPage() {
   const [signupEmailError, setSignupEmailError] = useState("")
   const [signupPasswordError, setSignupPasswordError] = useState("")
   const [signupConfirmPasswordError, setSignupConfirmPasswordError] = useState("")
+  const [resetCodeError, setResetCodeError] = useState("")
+
+  const [showPasswordMismatchAlert, setShowPasswordMismatchAlert] = useState(false)
+  const [showInvalidResetCodeAlert, setShowInvalidResetCodeAlert] = useState(false)
 
   useEffect(() => {
     const tab = searchParams.get('tab')
@@ -83,12 +91,34 @@ export default function AuthPage() {
     setSignupPasswordError(passwordError)
     setSignupConfirmPasswordError(confirmPasswordError)
 
+    if (confirmPasswordError) {
+      setShowPasswordMismatchAlert(true)
+      setTimeout(() => setShowPasswordMismatchAlert(false), 5000) // Hide alert after 5 seconds
+    }
+
     if (!nameError && !emailError && !passwordError && !confirmPasswordError) {
       if (!agreedToTerms) {
         alert("Please agree to the Terms of Service")
         return
       }
       console.log("Signup attempted with:", { name: signupName, email: signupEmail, password: signupPassword })
+    }
+  }
+
+  const handleForgotPassword = () => {
+    router.push('/request-token')
+  }
+
+  const handleResetPassword = (e: React.FormEvent) => {
+    e.preventDefault()
+    // This is a mock validation. In a real application, you would verify the reset code with your backend.
+    if (resetCode !== "123456") { // Example reset code
+      setResetCodeError("Invalid reset code")
+      setShowInvalidResetCodeAlert(true)
+      setTimeout(() => setShowInvalidResetCodeAlert(false), 5000) // Hide alert after 5 seconds
+    } else {
+      console.log("Password reset attempted with code:", resetCode)
+      // Here you would typically redirect to a page to set a new password
     }
   }
 
@@ -156,6 +186,38 @@ export default function AuthPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                <AnimatePresence>
+                  {showPasswordMismatchAlert && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -50 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -50 }}
+                    >
+                      <Alert variant="destructive" className="mb-4">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>
+                          Passwords do not match. Please try again.
+                        </AlertDescription>
+                      </Alert>
+                    </motion.div>
+                  )}
+                  {showInvalidResetCodeAlert && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -50 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -50 }}
+                    >
+                      <Alert variant="destructive" className="mb-4">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>
+                          Invalid reset code. Please check and try again.
+                        </AlertDescription>
+                      </Alert>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                   <TabsList className="grid w-full grid-cols-2 bg-blue-800">
                     <TabsTrigger value="login" className="text-blue-200 data-[state=active]:bg-blue-700">
@@ -236,6 +298,26 @@ export default function AuthPage() {
                                 transition={{ delay: 0.1 }}
                               >
                                 Login
+                              </motion.span>
+                            </Button>
+                          </motion.div>
+                          <motion.div
+                            variants={buttonVariants}
+                            whileHover="hover"
+                            whileTap="tap"
+                            className="mt-2"
+                          >
+                            <Button 
+                              className="w-full bg-transparent border border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white" 
+                              type="button"
+                              onClick={handleForgotPassword}
+                            >
+                              <motion.span
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.1 }}
+                              >
+                                Forgot Password
                               </motion.span>
                             </Button>
                           </motion.div>
@@ -326,12 +408,8 @@ export default function AuthPage() {
                                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-blue-200"
                               >
                                 I agree to the{" "}
-                               <Link href="/tos" className="text-blue-400 hover:underline">
-                               Terms of Service
-                              </Link>{" "}
-                                And 
-                                <Link href="/privacy-policy" className="text-blue-400 hover:underline">
-                                Privacy Policy
+                                <Link href="#" className="text-blue-400 hover:underline">
+                                  Terms of Service
                                 </Link>
                               </label>
                             </div>
@@ -373,23 +451,22 @@ export default function AuthPage() {
         </div>
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t border-blue-800">
-  <p className="text-xs text-blue-400">© 2024 Orbix Hosting. All rights reserved.</p>
-  <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-    {['Terms of Service', 'Privacy Policy'].map((item, index) => (
-      <motion.div
-        key={item}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 * (index + 1) }}
-      >
-        <Link
-          className="text-xs hover:underline underline-offset-4 text-blue-400"
-          href={item === 'Terms of Service' ? '/tos' : '/privacy-policy'}
-        >
-          {item}
-        </Link>
-      </motion.div>
-    ))}
-  </nav>
-</footer>
-</div>)}
+        <p className="text-xs text-blue-400">© 2024 Orbix Hosting. All rights reserved.</p>
+        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
+          {['Terms of Service', 'Privacy Policy', 'Cookie Policy'].map((item, index) => (
+            <motion.div
+              key={item}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * (index + 1) }}
+            >
+              <Link className="text-xs hover:underline underline-offset-4 text-blue-400" href="#">
+                {item}
+              </Link>
+            </motion.div>
+          ))}
+        </nav>
+      </footer>
+    </div>
+  )
+}
