@@ -65,13 +65,8 @@ export function LandingPage() {
           </nav>
           <div className="ml-4 flex gap-2">
         <Link href="/auth?tab=sign-in">
-          <Button variant="outline" className="border-blue-600 text-blue-400 hover:bg-blue-900 transform hover:scale-105 transition-all duration-200">
-            Login
-          </Button>
-        </Link>
-        <Link href="/auth?tab=signup">
-          <Button className="bg-blue-600 text-white hover:bg-blue-700 transform hover:scale-105 transition-all duration-200">
-            Register
+          <Button variant="outline" className="bg-blue-600 text-white hover:bg-blue-700 transform hover:scale-105 transition-all duration-200">
+            Login/Register
           </Button>
         </Link>
       </div>
