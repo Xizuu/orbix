@@ -64,14 +64,14 @@ export function LandingPage() {
             </Link>
           </nav>
           <div className="ml-4 flex gap-2">
-        <Link href="/auth#sign-in">
+        <Link href="/auth?tab=sign-in">
           <Button variant="outline" className="border-blue-600 text-blue-400 hover:bg-blue-900 transform hover:scale-105 transition-all duration-200">
-            Sign In
+            Login
           </Button>
         </Link>
-        <Link href="/auth#sign-up">
+        <Link href="/auth?tab=signup">
           <Button className="bg-blue-600 text-white hover:bg-blue-700 transform hover:scale-105 transition-all duration-200">
-            Sign Up
+            Register
           </Button>
         </Link>
       </div>
